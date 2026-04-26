@@ -7,7 +7,8 @@ const app = express();
 app.use(cors());
 
 const PORT = process.env.PORT || 3000;
-const CSV_FILE = "data.csv";
+const path = require("path");
+const CSV_FILE = path.join(__dirname, "data.csv");
 
 function readCSV(filterFn = null) {
   return new Promise((resolve, reject) => {
@@ -28,8 +29,11 @@ function readCSV(filterFn = null) {
         if (!filterFn || filterFn(row)) results.push(row);
       })
       .on("end", () => resolve(results))
-      .on("error", reject);
-  });
+      .on("error", (err) => {
+        console.error("Error baca CSV:", err);
+        reject(err);
+      });
+    });
 }
 
 app.get("/", (req, res) => res.send("API Sales Dashboard aktif"));
@@ -122,5 +126,5 @@ app.get("/options", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Server jalan di http://localhost:${PORT}`);
+  console.log(`✅ Server jalan di port : ${PORT}`);
 });
